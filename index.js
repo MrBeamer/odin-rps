@@ -1,7 +1,7 @@
 //Keep count of the Score
-let gameRound = 1;
 let playerScore = 0;
 let computerScore = 0;
+let gameRound = 1;
 
 //Helper function generates random number between 0 and 2
 const getRandomNumber = () => Math.floor(Math.random() * 3);
@@ -21,7 +21,6 @@ const getPlayersChoice = () => {
 };
 
 const calculateRoundResult = (playersChoice, computerChoice) => {
-  gameRound++;
   if (playersChoice === computerChoice) {
     return `Player: ${playersChoice} | Computer: ${computerChoice} | It is a draw.`;
   } else if (playersChoice === "rock" && computerChoice === "scissors") {
@@ -48,7 +47,10 @@ const printMessage = (roundResult) => {
 };
 
 // Starts a round of the game
-const playRound = (playersChoice, computerChoice) => {
+const playRound = () => {
+  console.log(`Round: ${gameRound++}`);
+  const playersChoice = getPlayersChoice();
+  const computerChoice = getComputerChoice();
   const roundResult = calculateRoundResult(playersChoice, computerChoice);
   printMessage(roundResult);
 };
@@ -56,10 +58,14 @@ const playRound = (playersChoice, computerChoice) => {
 const playGame = () => {
   while (gameRound <= 5) {
     // Calls functions and set playersChoice and computerChoice to returned values
-    const playersChoice = getPlayersChoice();
-    const computerChoice = getComputerChoice();
-    console.log(`Round: ${gameRound}`);
-    playRound(playersChoice, computerChoice);
+    playRound();
+  }
+  if (playerScore > computerScore) {
+    console.log("GAME OVER: You beat the machine!");
+  } else if (playerScore < computerScore) {
+    console.log("GAME OVER: The computer wins this time.");
+  } else {
+    console.log("GAME OVER: It's a total tie!");
   }
 };
 playGame();
