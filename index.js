@@ -2,6 +2,13 @@
 let playerScore = 0;
 let computerScore = 0;
 let gameRound = 1;
+let isGameOver = false;
+const roundNumber = document.querySelector(".round-number");
+const roundResultText = document.querySelector(".game-result");
+const scoreComputer = document.querySelector(".score-computer");
+const scorePlayer = document.querySelector(".score-player");
+const buttons = document.querySelector(".choices-container");
+const resetButton = document.querySelector("#restart");
 
 //Helper function generates random number between 0 and 2
 const getRandomNumber = () => Math.floor(Math.random() * 3);
@@ -12,60 +19,76 @@ const getComputerChoice = () => {
   return options[getRandomNumber()];
 };
 
-// Returns a players choice by using a prompt
-const getPlayersChoice = () => {
-  const playersChoice = prompt("Enter your choice: rock, paper, or scissors:")
-    .toLowerCase()
-    .trim();
-  return playersChoice;
-};
-
 const calculateRoundResult = (playersChoice, computerChoice) => {
   if (playersChoice === computerChoice) {
-    return `Player: ${playersChoice} | Computer: ${computerChoice} | It is a draw.`;
-  } else if (playersChoice === "rock" && computerChoice === "scissors") {
+    return `Computer: ${computerChoice} | It is a draw.`;
+  } else if (
+    (playersChoice === "rock" && computerChoice === "scissors") ||
+    (playersChoice === "paper" && computerChoice === "rock") ||
+    (playersChoice === "scissors" && computerChoice === "paper")
+  ) {
     playerScore++;
-    return `Player: ${playersChoice} | Computer: ${computerChoice} | Player wins.`;
-  } else if (playersChoice === "paper" && computerChoice === "rock") {
-    playerScore++;
-    return `Player: ${playersChoice} | Computer: ${computerChoice} | Player wins.`;
-  } else if (playersChoice === "scissors" && computerChoice === "paper") {
-    playerScore++;
-    return `Player: ${playersChoice} | Computer: ${computerChoice} | Player wins.`;
+    return `Computer: ${computerChoice} | Player wins.`;
   } else {
     computerScore++;
-    return `Player: ${playersChoice} | Computer: ${computerChoice} | Computer wins.`;
+    return `Computer: ${computerChoice} | Computer wins.`;
   }
 };
 
 // Prints rounds result
 const printMessage = (roundResult) => {
-  console.log(roundResult);
-  console.log(
-    `Player-Score: ${playerScore} | Computer-Score: ${computerScore}`,
-  );
+  roundResultText.textContent = roundResult;
+  scorePlayer.textContent = playerScore;
+  scoreComputer.textContent = computerScore;
 };
 
 // Starts a round of the game
-const playRound = () => {
-  console.log(`Round: ${gameRound++}`);
-  const playersChoice = getPlayersChoice();
+const playRound = (userInput) => {
   const computerChoice = getComputerChoice();
-  const roundResult = calculateRoundResult(playersChoice, computerChoice);
+  const roundResult = calculateRoundResult(userInput, computerChoice);
   printMessage(roundResult);
+  gameRound++;
+  if (gameRound <= 5) {
+    roundNumber.textContent = gameRound;
+  }
 };
 
-const playGame = () => {
-  while (gameRound <= 5) {
-    // Calls functions and set playersChoice and computerChoice to returned values
-    playRound();
-  }
+const declareWinner = () => {
   if (playerScore > computerScore) {
-    console.log("GAME OVER: You beat the machine!");
+    roundResultText.textContent = "GAME OVER: You beat the machine!";
   } else if (playerScore < computerScore) {
-    console.log("GAME OVER: The computer wins this time.");
+    roundResultText.textContent = "GAME OVER: The computer wins this time.";
   } else {
-    console.log("GAME OVER: It's a total tie!");
+    roundResultText.textContent = "GAME OVER: It's a total tie!";
   }
 };
-playGame();
+
+const playGame = (userInput) => {
+  console.log(userInput);
+
+  if (gameRound <= 5) {
+    playRound(userInput);
+  }
+  if (gameRound > 5) {
+    declareWinner();
+    buttons.removeEventListener("click", getPlayerChoice);
+  }
+};
+
+const resetGame = () => {
+  playerScore = 0;
+  computerScore = 0;
+  gameRound = 1;
+  roundNumber.textContent = gameRound;
+  scorePlayer.textContent = playerScore;
+  scoreComputer.textContent = computerScore;
+  roundResultText.textContent = "Make your choice";
+  buttons.addEventListener("click", getPlayerChoice);
+};
+
+const getPlayerChoice = (event) => {
+  const playerChoice = event.target.id;
+  playGame(playerChoice);
+};
+buttons.addEventListener("click", getPlayerChoice);
+resetButton.addEventListener("click", resetGame);
